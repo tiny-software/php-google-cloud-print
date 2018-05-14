@@ -19,18 +19,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once 'Config.php';
-require_once 'GoogleCloudPrint.php';
-    
+
+use GoogleCloudPrint\GoogleCloudPrint;
+
+include('config.php');
+
+session_start();
 // Create object
 $gcp = new GoogleCloudPrint();
-
-// Replace token you got in offlineToken.php
-$refreshTokenConfig['refresh_token'] = 'YOUR-OFFLINE-ACCESS-TOKEN';
-
-$token = $gcp->getAccessTokenByRefreshToken($urlconfig['refreshtoken_url'],http_build_query($refreshTokenConfig));
-
-$gcp->setAuthToken($token);
+$gcp->setAuthToken($_SESSION['accessToken']);
 
 $printers = $gcp->getPrinters();
 //print_r($printers);
@@ -55,5 +52,3 @@ else {
 		echo "An error occured while printing the doc. Error code:".$resarray['errorcode']." Message:".$resarray['errormessage'];
 	}
 }
-
-?>

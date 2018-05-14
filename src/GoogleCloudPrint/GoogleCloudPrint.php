@@ -25,7 +25,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-require_once 'HttpRequest.Class.php';
+namespace GoogleCloudPrint;
 
 class GoogleCloudPrint {
 	
@@ -33,17 +33,16 @@ class GoogleCloudPrint {
 	const PRINT_URL = "https://www.google.com/cloudprint/submit";
     const JOBS_URL = "https://www.google.com/cloudprint/jobs";
 
-	private $authtoken;
+	private $authToken;
 	private $httpRequest;
-	private $refreshtoken;
-	
+
 	/**
 	 * Function __construct
 	 * Set private members varials to blank
 	 */
 	public function __construct() {
 		
-		$this->authtoken = "";
+		$this->authToken = "";
 		$this->httpRequest = new HttpRequest();
 	}
 	
@@ -52,19 +51,23 @@ class GoogleCloudPrint {
 	 *
 	 * Set auth tokem
 	 * @param string $token token to set
+	 * @return $this
 	 */
 	public function setAuthToken($token) {
-		$this->authtoken = $token;
+		$this->authToken = $token;
+
+		return $this;
 	}
 	
 	/**
 	 * Function getAuthToken
 	 *
 	 * Get auth tokem
-	 * return auth tokem
+	 *
+	 * @return auth tokem
 	 */
 	public function getAuthToken() {
-		return $this->authtoken;
+		return $this->authToken;
 	}
 	
 	
@@ -74,14 +77,13 @@ class GoogleCloudPrint {
 	 * Gets access token by making http request
 	 * 
 	 * @param $url url to post data to
-	 * 
-	 * @param $post_fields post fileds array
-	 * 
-	 * return access tokem
+	 * @param $postFields post fileds array
+	 *
+	 * @return access tokem
 	 */
 	
-	public function getAccessTokenByRefreshToken($url,$post_fields) {
-		$responseObj =  $this->getAccessToken($url,$post_fields);
+	public function getAccessTokenByRefreshToken($url, $postFields) {
+		$responseObj =  $this->getAccessToken($url, $postFields);
 		return $responseObj->access_token;
 	}
 	
@@ -90,17 +92,15 @@ class GoogleCloudPrint {
 	 * Function getAccessToken
 	 *
 	 * Makes Http request call
-	 * 
 	 * @param $url url to post data to
-	 * 
-	 * @param $post_fields post fileds array
-	 * 
-	 * return http response
+	 * @param $postFields post fileds array
+	 *
+	 * @return object | boolean http response
 	 */
-	public function getAccessToken($url,$post_fields) {
+	public function getAccessToken($url, $postFields) {
 		
 		$this->httpRequest->setUrl($url);
-		$this->httpRequest->setPostData($post_fields);
+		$this->httpRequest->setPostData($postFields);
 		$this->httpRequest->send();
 		$response = json_decode($this->httpRequest->getResponse());
 		return $response;
@@ -116,22 +116,22 @@ class GoogleCloudPrint {
 	public function getPrinters() {
 		
 		// Check if we have auth token
-		if(empty($this->authtoken)) {
+		if(empty($this->authToken)) {
 			// We don't have auth token so throw exception
 			throw new Exception("Please first login to Google");
 		}
 		
 		// Prepare auth headers with auth token
-		$authheaders = array(
-		"Authorization: Bearer " .$this->authtoken
+		$authHeaders = array(
+		"Authorization: Bearer " .$this->authToken
 		);
 		
 		$this->httpRequest->setUrl(self::PRINTERS_SEARCH_URL);
-		$this->httpRequest->setHeaders($authheaders);
+		$this->httpRequest->setHeaders($authHeaders);
 		$this->httpRequest->send();
-		$responsedata = $this->httpRequest->getResponse();
+		$responseData = $this->httpRequest->getResponse();
 		// Make Http call to get printers added by user to Google Cloud Print
-		$printers = json_decode($responsedata);
+		$printers = json_decode($responseData);
 		// Check if we have printers?
 		if(is_null($printers)) {
 			// We dont have printers so return balnk array
@@ -149,54 +149,53 @@ class GoogleCloudPrint {
 	 * 
 	 * Sends document to the printer
 	 * 
-	 * @param Printer id $printerid    // Printer id returned by Google Cloud Print service
-	 * 
-	 * @param Job Title $printjobtitle // Title of the print Job e.g. Fincial reports 2012
-	 * 
-	 * @param File Path $filepath      // Path to the file to be send to Google Cloud Print
-	 * 
-	 * @param Content Type $contenttype // File content type e.g. application/pdf, image/png for pdf and images
+	 * @param $printerId printer id returned by Google Cloud Print service
+	 * @param $printJobTitle Print Job Title
+	 * @param $filePath Path to the file to be send to Google Cloud Print
+	 * @param $contentType File content type e.g. application/pdf, image/png for pdf and images
+	 *
+	 * @return array
 	 */
-	public function sendPrintToPrinter($printerid,$printjobtitle,$filepath,$contenttype) {
+	public function sendPrintToPrinter($printerId, $printJobTitle, $filePath, $contentType) {
 		
 	// Check if we have auth token
-		if(empty($this->authtoken)) {
+		if(empty($this->authToken)) {
 			// We don't have auth token so throw exception
 			throw new Exception("Please first login to Google by calling loginToGoogle function");
 		}
 		// Check if prtinter id is passed
-		if(empty($printerid)) {
+		if(empty($printerId)) {
 			// Printer id is not there so throw exception
 			throw new Exception("Please provide printer ID");	
 		}
 		// Open the file which needs to be print
-		$handle = fopen($filepath, "rb");
+		$handle = fopen($filePath, "rb");
 		if(!$handle)
 		{
 			// Can't locate file so throw exception
 			throw new Exception("Could not read the file. Please check file path.");
 		}
 		// Read file content
-		$contents = file_get_contents($filepath);
+		$contents = file_get_contents($filePath);
 		
 		// Prepare post fields for sending print
 		$post_fields = array(
 				
-			'printerid' => $printerid,
-			'title' => $printjobtitle,
+			'printerid' => $printerId,
+			'title' => $printJobTitle,
 			'contentTransferEncoding' => 'base64',
 			'content' => base64_encode($contents), // encode file content as base64
-			'contentType' => $contenttype		
+			'contentType' => $contentType
 		);
 		// Prepare authorization headers
-		$authheaders = array(
-			"Authorization: Bearer " . $this->authtoken
+		$authHeaders = array(
+			"Authorization: Bearer " . $this->authToken
 		);
 		
 		// Make http call for sending print Job
 		$this->httpRequest->setUrl(self::PRINT_URL);
 		$this->httpRequest->setPostData($post_fields);
-		$this->httpRequest->setHeaders($authheaders);
+		$this->httpRequest->setHeaders($authHeaders);
 		$this->httpRequest->send();
 		$response = json_decode($this->httpRequest->getResponse());
 		
@@ -211,21 +210,21 @@ class GoogleCloudPrint {
 		}
 	}
 
-    public function jobStatus($jobid)
+    public function jobStatus($jobId)
     {
         // Prepare auth headers with auth token
-        $authheaders = array(
-            "Authorization: Bearer " .$this->authtoken
+        $authHeaders = array(
+            "Authorization: Bearer " .$this->authToken
         );
 
         // Make http call for sending print Job
         $this->httpRequest->setUrl(self::JOBS_URL);
-        $this->httpRequest->setHeaders($authheaders);
+        $this->httpRequest->setHeaders($authHeaders);
         $this->httpRequest->send();
-        $responsedata = json_decode($this->httpRequest->getResponse());
+        $responseData = json_decode($this->httpRequest->getResponse());
 
-        foreach ($responsedata->jobs as $job)
-            if ($job->id == $jobid)
+        foreach ($responseData->jobs as $job)
+            if ($job->id == $jobId)
                 return $job->status;
 
         return 'UNKNOWN';
@@ -237,14 +236,15 @@ class GoogleCloudPrint {
 	 * 
 	 * Parse json response and return printers array
 	 * 
-	 * @param $jsonobj // Json response object
-	 * 
+	 * @param $jsonObj // Json response object
+	 *
+	 * @return printers list
 	 */
-	private function parsePrinters($jsonobj) {
+	private function parsePrinters($jsonObj) {
 		
 		$printers = array();
-		if (isset($jsonobj->printers)) {
-			foreach ($jsonobj->printers as $gcpprinter) {
+		if (isset($jsonObj->printers)) {
+			foreach ($jsonObj->printers as $gcpprinter) {
 				$printers[] = array('id' =>$gcpprinter->id,'name' =>$gcpprinter->name,'displayName' =>$gcpprinter->displayName,
 						    'ownerName' => @$gcpprinter->ownerName,'connectionStatus' => $gcpprinter->connectionStatus,
 						    );

@@ -19,18 +19,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use GoogleCloudPrint\GoogleCloudPrint;
 
-require_once 'GoogleCloudPrint.php';
+include('config.php');
 
-session_start();
 // Create object
 $gcp = new GoogleCloudPrint();
-$gcp->setAuthToken($_SESSION['accessToken']);
+
+// Replace token you got in offlineToken.php
+$refreshTokenConfig['refresh_token'] = 'YOUR-OFFLINE-ACCESS-TOKEN';
+
+$token = $gcp->getAccessTokenByRefreshToken($urlConfig['refresh_token_url'],http_build_query($refreshTokenConfig));
+
+$gcp->setAuthToken($token);
 
 $printers = $gcp->getPrinters();
 //print_r($printers);
 
-$printerid = "";
+$printerId = "";
 if(count($printers)==0) {
 	
 	echo "Could not get printers";
@@ -38,15 +44,17 @@ if(count($printers)==0) {
 }
 else {
 	
-	$printerid = $printers[0]['id']; // Pass id of any printer to be used for print
+	$printerId = $printers[0]['id']; // Pass id of any printer to be used for print
 	// Send document to the printer
-	$resarray = $gcp->sendPrintToPrinter($printerid, "Printing Doc using Google Cloud Printing", "./pdf.pdf", "application/pdf");
+	$resArray = $gcp->sendPrintToPrinter($printerId, "Printing Doc using Google Cloud Printing", "./demo.pdf", "application/pdf");
 	
-	if($resarray['status']==true) {
+	if($resArray['status']==true) {
 		
 		echo "Document has been sent to printer and should print shortly.";
 	}
 	else {
-		echo "An error occured while printing the doc. Error code:".$resarray['errorcode']." Message:".$resarray['errormessage'];
+		echo "An error occured while printing the doc. Error code:".$resArray['errorcode']." Message:".$resArray['errormessage'];
 	}
 }
+
+?>

@@ -25,38 +25,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+use GoogleCloudPrint\GoogleCloudPrint;
+
+include('config.php');
+
+if (isset($_GET['op'])) {
+	
+	if ($_GET['op']=="getauth") {
+		header("Location: ".$urlConfig['authorization_url']."?".http_build_query($redirectConfig));
+		exit;
+	}
+	else if ($_GET['op']=="offline") {
+		header("Location: ".$urlConfig['authorization_url']."?".http_build_query(array_merge($redirectConfig,$offlineAccessConfig)));
+		exit;
+	}
+}
+
+session_start();
+
+// Google redirected back with code in query string.
+if(isset($_GET['code']) && !empty($_GET['code'])) {
     
-    $redirectConfig = array(
-        'client_id' 	=> 'YOUR-CLIENT-ID',
-        'redirect_uri' 	=> 'http://yourdomain.com/oAuthRedirect.php',
-        'response_type' => 'code',
-        'scope'         => 'https://www.googleapis.com/auth/cloudprint',
-    );
+    $code = $_GET['code'];
+    $authConfig['code'] = $code;
     
-    $authConfig = array(
-        'code' => '',
-        'client_id' 	=> 'YOUR-CLIENT-ID',
-        'client_secret' => 'YOUR-CLIENT-SECRET',
-        'redirect_uri' 	=> 'http://yourdomain.com/oAuthRedirect.php',
-        "grant_type"    => "authorization_code"
-    );
+    // Create object
+    $gcp = new GoogleCloudPrint();
+    $responseObj = $gcp->getAccessToken($urlConfig['access_token_url'],$authConfig);
     
-    $offlineAccessConfig = array(
-        'access_type' => 'offline'
-    );
-    
-    $refreshTokenConfig = array(
-        
-        'refresh_token' => "",
-        'client_id' => $authConfig['client_id'],
-        'client_secret' => $authConfig['client_secret'],
-        'grant_type' => "refresh_token" 
-    );
-    
-    $urlconfig = array(	
-        'authorization_url' 	=> 'https://accounts.google.com/o/oauth2/auth',
-        'accesstoken_url'   	=> 'https://accounts.google.com/o/oauth2/token',
-        'refreshtoken_url'      => 'https://www.googleapis.com/oauth2/v3/token'
-    );
-    
+    $accessToken = $responseObj->access_token;
+
+    // We requested offline access
+    if (isset($responseObj->refresh_token)) {
+	header("Location: offlineToken.php?offlinetoken=".$responseObj->refresh_token);
+	exit;
+    }
+    $_SESSION['accessToken'] = $accessToken;
+    header("Location: example.php");
+}
+
 ?>
