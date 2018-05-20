@@ -118,7 +118,7 @@ class GoogleCloudPrint {
 		// Check if we have auth token
 		if(empty($this->authToken)) {
 			// We don't have auth token so throw exception
-			throw new Exception("Please first login to Google");
+			throw new \Exception("Please first login to Google");
 		}
 		
 		// Prepare auth headers with auth token
