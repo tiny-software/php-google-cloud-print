@@ -1,0 +1,23 @@
+{
+    "name": "cbichis/php-google-cloud-print",
+    "description": "PHP Google Cloud Print",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+
+    ],
+    "authors": [
+
+    ],
+    "require": {
+        "php": ">=5.6 || >= 7.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-0": {
+            "GoogleCloudPrint": "src/"
+        }
+    },
+    "version": "1.0.0"
+}

@@ -25,19 +25,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-    
+
     $redirectConfig = array(
-        'client_id' 	=> 'YOUR-CLIENT-ID',
-        'redirect_uri' 	=> 'http://yourdomain.com/oAuthRedirect.php',
+        'client_id' 	=> '141438937962-h4b2meifd32se69p2joitrdle1f38f0l.apps.googleusercontent.com',
+        'redirect_uri' 	=> 'http://test.floro.ro/oAuthRedirect.php',
         'response_type' => 'code',
         'scope'         => 'https://www.googleapis.com/auth/cloudprint',
     );
     
     $authConfig = array(
         'code' => '',
-        'client_id' 	=> 'YOUR-CLIENT-ID',
-        'client_secret' => 'YOUR-CLIENT-SECRET',
-        'redirect_uri' 	=> 'http://yourdomain.com/oAuthRedirect.php',
+        'client_id' 	=> '141438937962-h4b2meifd32se69p2joitrdle1f38f0l.apps.googleusercontent.com',
+        'client_secret' => '6V78SsnT425axdrJWcGqLJaf',
+        'redirect_uri' 	=> 'http://test.floro.ro/oAuthRedirect.php',
         "grant_type"    => "authorization_code"
     );
     
@@ -53,8 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         'grant_type' => "refresh_token" 
     );
     
-    $urlConfig = array(
+    $urlconfig = array(	
         'authorization_url' 	=> 'https://accounts.google.com/o/oauth2/auth',
         'access_token_url'   	=> 'https://accounts.google.com/o/oauth2/token',
         'refresh_token_url'      => 'https://www.googleapis.com/oauth2/v3/token'
     );
+
