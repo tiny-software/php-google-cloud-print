@@ -156,7 +156,7 @@ class GoogleCloudPrint {
 	 *
 	 * @return array
 	 */
-	public function sendPrintToPrinter($printerId, $printJobTitle, $filePath, $contentType) {
+	public function sendPrintToPrinter($printerId, $printJobTitle, $filePath, $contentType, $ticket = []) {
 		
 	// Check if we have auth token
 		if(empty($this->authToken)) {
@@ -187,6 +187,11 @@ class GoogleCloudPrint {
 			'content' => base64_encode($contents), // encode file content as base64
 			'contentType' => $contentType
 		);
+
+		if(!empty($ticket)){
+			$post_fields['ticket'] = json_encode($ticket);
+		}
+
 		// Prepare authorization headers
 		$authHeaders = array(
 			"Authorization: Bearer " . $this->authToken
