@@ -27,17 +27,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
     $redirectConfig = array(
-        'client_id' 	=> '141438937962-h4b2meifd32se69p2joitrdle1f38f0l.apps.googleusercontent.com',
-        'redirect_uri' 	=> 'http://test.floro.ro/oAuthRedirect.php',
+        'client_id' 	=> 'YOUR-CLIENT-ID',
+        'redirect_uri' 	=> 'http://yourdomain.com/oAuthRedirect.php',
         'response_type' => 'code',
         'scope'         => 'https://www.googleapis.com/auth/cloudprint',
     );
     
     $authConfig = array(
         'code' => '',
-        'client_id' 	=> '141438937962-h4b2meifd32se69p2joitrdle1f38f0l.apps.googleusercontent.com',
-        'client_secret' => '6V78SsnT425axdrJWcGqLJaf',
-        'redirect_uri' 	=> 'http://test.floro.ro/oAuthRedirect.php',
+        'client_id' 	=> 'YOUR-CLIENT-ID',
+        'client_secret' => 'YOUR-CLIENT-SECRET',
+        'redirect_uri' 	=> 'http://yourdomain.com/oAuthRedirect.php',
         "grant_type"    => "authorization_code"
     );
     
