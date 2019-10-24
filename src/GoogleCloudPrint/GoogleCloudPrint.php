@@ -202,18 +202,9 @@ class GoogleCloudPrint {
 
 		// Has document been successfully sent?
 		if ($response->success == "1") {
-			return array(
-				'status' => true,
-				'errorcode' => '',
-				'errormessage' => "",
-				'id' => $response->job->id
-			);
+			return $response->job->id;
 		} else {
-			return array(
-				'status' => false,
-				'errorcode' => $response->errorCode,
-				'errormessage' => $response->message
-			);
+			throw new \Exception($response->message, $response->errorCode);
 		}
 	}
 
