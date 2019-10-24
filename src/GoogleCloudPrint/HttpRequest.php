@@ -28,10 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace GoogleCloudPrint;
 
-class HttpRequest
-{
-	public $httpResponse;
+class HttpRequest {
 
+	public $httpResponse;
 	public $ch;
 
 	/**
@@ -40,9 +39,7 @@ class HttpRequest
 	 *
 	 * @param url $url // Url to send http request to
 	 */
-	public function __construct($url = null)
-	{
-
+	public function __construct($url = null) {
 		// Initialize curl
 		$this->ch = curl_init();
 
@@ -63,8 +60,7 @@ class HttpRequest
 	 *
 	 * @param string $url // http request url
 	 */
-	public function setUrl($url)
-	{
+	public function setUrl($url) {
 		curl_setopt($this->ch, CURLOPT_URL, $url);
 	}
 
@@ -74,9 +70,7 @@ class HttpRequest
 	 *
 	 * @param array $params // Key value pairs of data to be posted
 	 */
-	public function setPostData($params)
-	{
-
+	public function setPostData($params) {
 		curl_setopt($this->ch, CURLOPT_POST, true);
 		curl_setopt($this->ch, CURLOPT_POSTFIELDS, $params);
 	}
@@ -87,8 +81,7 @@ class HttpRequest
 	 *
 	 * @param array $headers // array containing headers
 	 */
-	public function setHeaders($headers)
-	{
+	public function setHeaders($headers) {
 		curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
 	}
 
@@ -97,8 +90,7 @@ class HttpRequest
 	 * Send http request
 	 * return void
 	 */
-	public function send()
-	{
+	public function send() {
 		// execute curl
 		$this->httpResponse = curl_exec($this->ch);
 	}
@@ -108,8 +100,7 @@ class HttpRequest
 	 * return response of last http request sent
 	 * return http response
 	 */
-	public function getResponse()
-	{
+	public function getResponse() {
 		return $this->httpResponse;
 	}
 
@@ -117,10 +108,8 @@ class HttpRequest
 	 * Function __destruct
 	 * class destructor
 	 */
-	public function __destruct()
-	{
+	public function __destruct() {
 		curl_close($this->ch);
 	}
-}
 
-?>
+}
