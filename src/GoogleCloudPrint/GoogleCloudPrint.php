@@ -110,27 +110,23 @@ class GoogleCloudPrint {
 	 * to Google Cloud Print service.
 	 */
 	public function getPrinters() {
-		// Check if we have auth token
 		if (empty($this->authToken)) {
-			// We don't have auth token so throw exception
 			throw new \Exception("Please first login to Google");
 		}
 
-		// Prepare auth headers with auth token
 		$authHeaders = array("Authorization: Bearer " . $this->authToken);
 
+		// Make Http call to get printers added by user to Google Cloud Print
 		$this->httpRequest->setUrl(self::PRINTERS_SEARCH_URL);
 		$this->httpRequest->setHeaders($authHeaders);
 		$this->httpRequest->send();
 		$responseData = $this->httpRequest->getResponse();
-		// Make Http call to get printers added by user to Google Cloud Print
 		$printers = json_decode($responseData);
-		// Check if we have printers?
+
 		if (is_null($printers)) {
-			// We dont have printers so return balnk array
+			// We dont have printers so return blank array
 			return array();
 		} else {
-			// We have printers so returns printers as array
 			return $this->parsePrinters($printers);
 		}
 	}
@@ -150,47 +146,37 @@ class GoogleCloudPrint {
 	public function sendPrintToPrinter(
 		$printerId,
 		$printJobTitle,
-		$filePath,
+		$contents,
 		$contentType,
 		$ticket = []
 	) {
-		// Check if we have auth token
 		if (empty($this->authToken)) {
-			// We don't have auth token so throw exception
 			throw new \Exception(
 				"Please first login to Google by calling loginToGoogle function"
 			);
 		}
-		// Check if prtinter id is passed
+
 		if (empty($printerId)) {
-			// Printer id is not there so throw exception
 			throw new \Exception("Please provide printer ID");
 		}
-		// Open the file which needs to be print
-		$handle = fopen($filePath, "rb");
-		if (!$handle) {
-			// Can't locate file so throw exception
-			throw new \Exception(
-				"Could not read the file. Please check file path."
-			);
-		}
-		// Read file content
-		$contents = file_get_contents($filePath);
 
-		// Prepare post fields for sending print
 		$post_fields = array(
 			'printerid' => $printerId,
 			'title' => $printJobTitle,
-			'contentTransferEncoding' => 'base64',
-			'content' => base64_encode($contents), // encode file content as base64
 			'contentType' => $contentType
 		);
+
+		if ($contentType == "url") {
+			$post_fields["content"] = $contents;
+		} else {
+			$post_fields['contentTransferEncoding'] = 'base64';
+			$post_fields['content'] = base64_encode($contents);
+		}
 
 		if (!empty($ticket)) {
 			$post_fields['ticket'] = json_encode($ticket);
 		}
 
-		// Prepare authorization headers
 		$authHeaders = array("Authorization: Bearer " . $this->authToken);
 
 		// Make http call for sending print Job
@@ -200,7 +186,6 @@ class GoogleCloudPrint {
 		$this->httpRequest->send();
 		$response = json_decode($this->httpRequest->getResponse());
 
-		// Has document been successfully sent?
 		if ($response->success == "1") {
 			return $response->job->id;
 		} else {
@@ -209,7 +194,6 @@ class GoogleCloudPrint {
 	}
 
 	public function jobStatus($jobId) {
-		// Prepare auth headers with auth token
 		$authHeaders = array("Authorization: Bearer " . $this->authToken);
 
 		// Make http call for sending print Job
